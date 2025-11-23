@@ -3,100 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>HAWKEYE | REPORT</title>
+    <title>HAWKEYE | SCAN</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/phosphor-icons"></script>
-    <style>
-        /* Custom scrollbar for tactical/sleek look */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0F172A; /* bg-slate-900 */
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #3B82F6; /* blue-500 */
-            border-radius: 4px;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body class="bg-slate-950 text-white min-h-screen p-4 pt-10 font-sans">
 
-    <header class="mb-8">
-        <h1 class="text-4xl font-extrabold tracking-tight text-blue-500 uppercase">MISSION REPORT</h1>
-        <p class="text-xl text-emerald-400 font-mono mt-2">TARGETS ACQUIRED: {{ listings|length }}</p>
-        <div class="h-1 w-full bg-blue-500/50 mt-4"></div>
-    </header>
+    <div class="max-w-md mx-auto lg:max-w-4xl lg:pt-16">
 
-    <main class="space-y-8">
-        
-        {% for item in listings %}
-        <div class="bg-slate-900/70 p-4 border-2 border-blue-500 rounded-lg shadow-xl shadow-blue-500/20">
+        <header class="mb-8">
+            <h1 class="text-4xl font-extrabold tracking-tight text-blue-500 uppercase">HAWKEYE</h1>
+            <p class="text-sm text-emerald-400 font-mono">ARBITRAGE SYSTEM v1.0</p>
+        </header>
+
+        <form id="scanForm" action="/scan" method="post" enctype="multipart/form-data">
+
+            <div class="flex flex-col lg:flex-row lg:space-x-8">
+                <div class="space-y-6 mb-8 p-4 border border-slate-700/50 rounded-lg bg-slate-900/50 lg:w-1/2 lg:mb-0">
+                    <h2 class="text-lg font-bold text-slate-200 border-b border-slate-800 pb-2 flex items-center"><i class="ph ph-gear-six text-emerald-400 mr-2"></i> CORE PARAMETERS</h2>
+
+                    <div class="mb-4">
+                        <label for="platform" class="block text-sm font-semibold mb-2 text-slate-300">TARGET PLATFORM:</label>
+                        <div class="tactical-select-wrapper">
+                            <select id="platform" name="platform" class="tactical-select w-full border-2 border-blue-500 focus:border-emerald-400 p-3 rounded-lg shadow-inner focus:outline-none transition duration-200">
+                                <option value="eBay">eBay</option>
+                                <option value="Depop">Depop</option>
+                                <option value="Facebook Marketplace">FB Marketplace</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="confidence" class="block text-sm font-semibold mb-2 text-slate-300 flex justify-between items-center">
+                            <span class="flex items-center"><i class="ph ph-chart-line-up mr-2"></i> AI SENSITIVITY:</span>
+                            <span id="confidenceValue" class="font-mono text-emerald-400">75%</span>
+                        </label>
+                        <input type="range" id="confidence" name="confidence" min="50" max="99" value="75" step="1" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer range-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+
+                <div class="lg:w-1/2">
+                    <div class="flex border-b border-slate-700 mb-6 lg:mt-0">
+                        <button type="button" id="tab-file" class="tactical-tab active" onclick="showInput('file')">
+                            <i class="ph ph-camera mr-1"></i> VISUAL SCAN
+                        </button>
+                    </div>
+
+                    <div id="scannerZoneContainer">
+                        <div id="fileInputPanel" class="mb-10 relative overflow-hidden bg-slate-900/50 h-64 shadow-inner shadow-blue-500/20 transition duration-300">
+                            
+                            <div id="scannerBorder" class="absolute inset-0 border-4 border-dashed border-blue-500/50 rounded-xl pointer-events-none">
+                                <div class="absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 border-emerald-400"></div>
+                                <div class="absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 border-emerald-400"></div>
+                                <div class="absolute bottom-0 left-0 w-4 h-4 border-l-2 border-b-2 border-emerald-400"></div>
+                                <div class="absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 border-emerald-400"></div>
+                            </div>
+
+                            <label for="file-upload" class="cursor-pointer flex flex-col items-center justify-center w-full h-full text-center p-4">
+                                <input id="file-upload" name="video" type="file" class="absolute inset-0 opacity-0 cursor-pointer" accept="video/*" required>
+                                
+                                <div class="relative z-10">
+                                    <i id="scannerIcon" class="ph ph-camera text-6xl text-emerald-400 mb-2 transition duration-300"></i>
+                                    <span id="scannerText" class="text-xl font-mono text-slate-300 tracking-wider transition duration-300 block">INITIATE LIVE SCAN</span>
+                                    <span id="scannerHint" class="text-sm text-blue-500 mt-1 font-mono transition duration-300 block">(Tap to upload video)</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
             
-            <div class="flex items-start mb-4">
-                
-                <div class="relative w-24 h-24 flex-shrink-0 mr-4 border-2 border-emerald-400 rounded-md overflow-hidden bg-slate-800">
-                    <img src="{{ item.image }}" alt="{{ item.title }}" class="w-full h-full object-cover opacity-75">
-                    <div class="absolute inset-0 border-4 border-dotted border-red-500/50 pointer-events-none"></div>
-                    <i class="ph ph-target-bold absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-red-500 text-3xl opacity-75"></i>
-                </div>
-                
-                <div>
-                    <h2 class="text-xl font-bold text-white mb-1 leading-snug">{{ item.title }}</h2>
-                    <p class="text-sm text-slate-400 font-mono">Bundle: <span class="text-blue-400">{{ item.items | join(', ') }}</span></p>
-                </div>
-            </div>
+            <button type="submit" onclick="document.getElementById('hudOverlay').classList.remove('hidden')" class="w-full py-4 text-xl font-bold uppercase tracking-widest rounded-lg bg-blue-600 hover:bg-blue-500 text-white transition duration-150 focus:outline-none focus:ring-4 focus:ring-blue-500/50 shadow-lg shadow-blue-900/50">
+             EXECUTE ANALYSIS
+            </button>
+        </form>
 
-            {% if item.voice_note %}
-            <div class="bg-yellow-900/50 border border-yellow-500 text-yellow-300 p-3 mb-4 rounded-md flex items-center shadow-md">
-                <i class="ph ph-microphone-stage text-2xl mr-3 flex-shrink-0"></i>
-                <span class="text-sm font-semibold uppercase tracking-tight">🎤 AUDIO INTEL:</span>
-                <span class="text-sm ml-2 font-mono">{{ item.voice_note }}</span>
+        <div id="hudOverlay" class="hidden fixed inset-0 bg-slate-950/95 flex flex-col items-center justify-center z-50 p-8">
+            <i class="ph ph-circle-notch ph-spin text-7xl text-emerald-400 mb-6"></i>
+            <div class="w-full max-w-sm border-2 border-blue-500 p-4 font-mono text-emerald-400 text-left text-sm tracking-tighter bg-slate-900 shadow-xl shadow-blue-500/30">
+                <p class="hud-text mb-2">&gt; ESTABLISHING UPLINK...</p>
+                <p class="hud-text mb-2">&gt; PARSING AUDIO TRACK...</p>
+                <p class="hud-text">&gt; CALCULATING MARGINS...</p>
             </div>
-            {% endif %}
-
-            <div class="grid grid-cols-3 gap-2 text-center border-t border-b border-slate-700 py-3 mb-4">
-                
-                <div class="p-1">
-                    <p class="text-xs font-semibold uppercase text-orange-400">QUICK</p>
-                    <p class="text-xl font-mono text-orange-300 font-bold">{{ item.prices.quick }}</p>
-                </div>
-                
-                <div class="p-1 border-l border-r border-slate-700">
-                    <p class="text-xs font-semibold uppercase text-blue-500">MARKET</p>
-                    <p class="text-3xl font-mono text-blue-400 font-extrabold leading-none">{{ item.prices.market }}</p>
-                </div>
-                
-                <div class="p-1">
-                    <p class="text-xs font-semibold uppercase text-emerald-400">REACH</p>
-                    <p class="text-xl font-mono text-emerald-300 font-bold">{{ item.prices.reach }}</p>
-                </div>
-            </div>
-
-            <div class="mt-4">
-                <label for="desc-{{ loop.index }}" class="block text-sm font-semibold mb-2 text-slate-300">LISTING DESCRIPTION:</label>
-                <div class="relative">
-                    <textarea id="desc-{{ loop.index }}" readonly rows="4" class="w-full p-3 font-mono text-sm bg-slate-800 border border-slate-700 rounded-md text-slate-200 resize-none focus:outline-none" onclick="this.select()">{{ item.description }}</textarea>
-                    <button 
-                        onclick="navigator.clipboard.writeText(document.getElementById('desc-{{ loop.index }}').value); this.innerText = 'COPIED!'; setTimeout(() => this.innerText = 'COPY', 1000);"
-                        class="absolute bottom-2 right-2 px-3 py-1 text-xs font-semibold uppercase bg-emerald-600 hover:bg-emerald-500 rounded-full transition duration-150 text-white tracking-widest"
-                    >
-                        COPY
-                    </button>
-                </div>
-            </div>
-
+            <p class="text-sm text-slate-400 mt-4 font-mono">STAND BY. TARGET LOCK IN PROGRESS...</p>
         </div>
-        {% endfor %}
-
-    </main>
     
-    <div class="mt-10 text-center">
-        <a href="/scan" class="inline-flex items-center text-blue-400 hover:text-blue-300 font-mono text-sm">
-            <i class="ph ph-arrow-counter-clockwise mr-2"></i>
-            NEW SCAN INITIATED
-        </a>
-    </div>
-
+    </div> 
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>

@@ -53,23 +53,29 @@ def analyze_video_feed(video_path, platform_strategy):
         raise ValueError("Gemini failed to process the video.")
 
     # C. The "HawkEye" Prompt
-    print("🧠 HawkEye Thinking...")
+    print("🧠 HawkEye Thinking (Optimizing for Clarity)...")
     
     prompt = f"""
     You are 'HawkEye', an expert reseller AI.
     Strategy: {platform_strategy}.
     
+    CRITICAL VISUAL INSTRUCTION:
+    You are looking for the "HERO SHOT" for each item.
+    - The "Hero Shot" is the exact timestamp where the camera is **STATIONARY** and the item is **IN FOCUS**.
+    - **DO NOT** select a timestamp where the camera is panning or moving (Motion Blur).
+    - If the user pans over an item and then pauses for a split second, select the **PAUSE**.
+    
     INSTRUCTIONS:
-    1. Watch the video. **Identify EVERY distinct item** you see.
-    2. If there are 2 items, return 2 objects. If 5, return 5.
-    3. Listen to the AUDIO. Did the user mention damage or brand names?
-    4. Return pure JSON. Do not add markdown formatting.
+    1. Watch the video. Identify EVERY distinct item.
+    2. For each item, scrub through the footage to find the **clearest, least blurry frame**.
+    3. Listen to the AUDIO for condition notes.
+    4. Return pure JSON.
     
     OUTPUT SCHEMA (List of Objects):
     [
       {{
         "title": "Item Name",
-        "timestamp": 2.5,
+        "timestamp": 2.5,  // MUST be the most stable frame
         "voice_note": "User said...",
         "description": "Sales copy for {platform_strategy}",
         "prices": {{ "quick": 10, "market": 15, "reach": 20 }}

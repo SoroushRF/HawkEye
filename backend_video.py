@@ -19,8 +19,8 @@ def crop_frame(video_path, timestamp, output_folder, item_name):
         (
             ffmpeg
             .input(video_path, ss=timestamp)
-            .filter('scale', 800, -1)
-            .output(output_path, vframes=1)
+            .filter('scale', 1080, -1) # INCREASED RESOLUTION: 800 -> 1080
+            .output(output_path, vframes=1, **{'q:v': 2}) # NEW: Force High Quality (2 is best for JPG)
             .overwrite_output()
             .run(capture_stdout=True, capture_stderr=True)
         )
