@@ -1,4 +1,5 @@
 import os
+import urllib.parse
 from flask import Flask, render_template, request
 from backend_video import crop_frame
 from backend_ai import analyze_video_feed
@@ -22,18 +23,16 @@ def home():
 
 @app.route('/scan', methods=['POST'])
 def scan_endpoint():
+    # 1. Validation
     if 'video' not in request.files:
         return "No video uploaded", 400
     
     video = request.files['video']
     
-    # Capture the new inputs from your friend's form
+    # Capture inputs
     platform = request.form.get('platform', 'eBay')
-    confidence = request.form.get('confidence', '75') # New!
     
-    # ... rest of your code ...
-    
-    # 2. Save Video Locally
+    # 2. Save Video Locally (This defines video_path!)
     video_path = os.path.join(app.config['UPLOAD_FOLDER'], video.filename)
     video.save(video_path)
     print(f"✅ Video saved to: {video_path}")
@@ -43,35 +42,41 @@ def scan_endpoint():
         import json
         import time
         time.sleep(3)
-        # You will create this file later as a backup
+        # Ensure dummy_data.json exists if you use this!
         with open('dummy_data.json') as f:
             return render_template('report.html', listings=json.load(f), platform=platform)
 
     # 4. Run AI Logic (The Brain)
     try:
-        # Call the function you just verified
         listings = analyze_video_feed(video_path, platform)
     except Exception as e:
         print(f"❌ AI Error: {e}")
         return f"AI Processing Failed: {str(e)}", 500
 
-    # 5. Run Video Logic (The Cropper)
-    print("✂️ Cutting images based on AI timestamps...")
+    # 5. Run Video Logic & BUILD LINKS
+    print("✂️ Processing Items...")
     for item in listings:
-        # Use .get() to be safe if AI forgets a field
-        timestamp = item.get('timestamp', 0)
-        title = item.get('title', 'Unknown_Item')
-        
-        # Call the FFmpeg function
+        # A. Crop Image
         image_name = crop_frame(
             video_path, 
-            timestamp, 
+            item.get('timestamp', 0), 
             app.config['PRODUCT_FOLDER'], 
-            title
+            item.get('title', 'Unknown_Item')
         )
-        
-        # Add the filename to the dictionary so HTML can find it
         item['image'] = image_name
+
+        # B. BUILD LIVE MARKET LINKS (The Fix)
+        # We URL-encode the title so spaces become %20, etc.
+        safe_query = urllib.parse.quote(item['title'])
+        
+        # Link 1: eBay SOLD Listings (Shows actual market value)
+        ebay_link = f"https://www.ebay.com/sch/i.html?_nkw={safe_query}&LH_Sold=1&LH_Complete=1"
+        
+        # Link 2: Google Shopping
+        google_link = f"https://www.google.com/search?q={safe_query}&tbm=shop"
+        
+        # Add these to the item dictionary
+        item['sources'] = [ebay_link, google_link]
 
     # 6. Render Results
     print(f"🚀 Rendering report with {len(listings)} items...")

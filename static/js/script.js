@@ -1,10 +1,5 @@
 // --- 1. CORE FUNCTIONALITY ---
 
-/**
- * Switches between file upload/camera input and video URL input.
- * Manages panel visibility and 'required' status for form submission validation.
- * @param {string} type - 'file' or 'video'
- */
 function showInput(type) {
     const filePanel = document.getElementById('fileInputPanel');
     const videoPanel = document.getElementById('videoInputPanel');
@@ -14,7 +9,6 @@ function showInput(type) {
     const videoInput = document.getElementById('video-url');
 
     if (type === 'file') {
-        // Activate File/Camera Panel
         filePanel.classList.remove('hidden');
         videoPanel.classList.add('hidden');
         fileTab.classList.add('active');
@@ -24,7 +18,6 @@ function showInput(type) {
         videoInput.required = false;
         videoInput.value = ''; 
     } else if (type === 'video') {
-        // Activate Video URL Panel
         filePanel.classList.add('hidden');
         videoPanel.classList.remove('hidden');
         fileTab.classList.remove('active');
@@ -37,69 +30,78 @@ function showInput(type) {
 }
 
 /**
- * Attaches the visual feedback effect to the file input click.
+ * Updates the visual status (Checkmark vs Upload Icon).
  */
+function updateScanStatus(file) {
+    const checkIcon = document.getElementById('scanStatusCheck');
+    const scannerText = document.getElementById('scannerText');
+    const scannerIcon = document.getElementById('scannerIcon');
+
+    if (file) {
+        // 1. Show the Stable Checkmark
+        checkIcon.classList.remove('hidden');
+        
+        // 2. Detect Type and Change Text/Main Icon
+        if (file.type.startsWith('video/')) {
+            scannerText.textContent = 'Video Received!';
+            scannerIcon.className = 'ph ph-video-camera text-4xl text-green-500'; 
+        } else {
+            scannerText.textContent = 'Photo Received!';
+            scannerIcon.className = 'ph ph-image text-4xl text-green-500'; 
+        }
+        
+        // 3. Make text green
+        scannerText.classList.add('text-green-600');
+        scannerText.classList.remove('text-gray-700');
+        
+    } else {
+        // RESET TO DEFAULT
+        checkIcon.classList.add('hidden');
+        scannerText.textContent = 'Upload Photo or Video';
+        scannerText.classList.remove('text-green-600');
+        scannerText.classList.add('text-gray-700');
+        
+        scannerIcon.className = 'ph ph-upload-simple text-4xl text-blue-500'; 
+    }
+}
+
+
 function attachTapEffect() {
-    document.getElementById('file-upload').addEventListener('click', function() {
-        const icon = document.getElementById('scannerIcon');
-        const text = document.getElementById('scannerText');
-        const hint = document.getElementById('scannerHint');
-        const scannerBorder = document.getElementById('scannerBorder');
-
-        // --- Visual Confirmation (Target Lock) ---
-        icon.classList.remove('ph-camera', 'text-emerald-400');
-        icon.classList.add('ph-check-circle', 'text-red-500', 'animate-pulse');
-        scannerBorder.classList.add('border-red-500');
-        scannerBorder.classList.remove('border-blue-500/50');
-
-        text.textContent = 'CAMERA ACTIVATED';
-        text.classList.add('text-red-400');
-        text.classList.remove('text-slate-300');
-
-        hint.textContent = 'SCAN INITIATED...';
-        hint.classList.add('text-red-400');
-        hint.classList.remove('text-blue-500');
-
-        // --- Revert After a Short Delay (0.8s) ---
-        setTimeout(() => {
-            icon.classList.remove('ph-check-circle', 'text-red-500', 'animate-pulse');
-            icon.classList.add('ph-camera', 'text-emerald-400');
-            scannerBorder.classList.remove('border-red-500');
-            scannerBorder.classList.add('border-blue-500/50');
-            
-            text.textContent = 'INITIATE LIVE SCAN';
-            text.classList.remove('text-red-400');
-            text.classList.add('text-slate-300');
-
-            hint.textContent = '(Tap to activate camera/video capture)';
-            hint.classList.remove('text-red-400');
-            hint.classList.add('text-blue-500');
-        }, 800); 
-    });
-}
-
-/**
- * Updates the AI Confidence Threshold display value in real-time.
- */
-function attachSliderListener() {
-    const slider = document.getElementById('confidence');
-    const valueDisplay = document.getElementById('confidenceValue');
+    const fileInput = document.getElementById('file-upload');
+    const filePanel = document.getElementById('fileInputPanel');
     
-    // Set initial value
-    valueDisplay.textContent = slider.value + '%';
+    // Visual flash when clicking
+    fileInput.addEventListener('click', function() {
+        filePanel.classList.add('border-blue-500', 'bg-blue-50');
+        setTimeout(() => {
+            filePanel.classList.remove('border-blue-500', 'bg-blue-50');
+        }, 300); 
+    });
 
-    slider.addEventListener('input', function() {
-        valueDisplay.textContent = this.value + '%';
+    // Handle file selection
+    fileInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            updateScanStatus(this.files[0]); 
+        } else {
+            updateScanStatus(null); 
+        }
     });
 }
 
-// --- 2. INITIALIZATION ---
+// Loading Screen Animation
+document.getElementById('scanForm').addEventListener('submit', function(e) {
+    const hudOverlay = document.getElementById('hudOverlay');
+    
+    hudOverlay.classList.remove('hidden');
+
+    setTimeout(() => {
+        hudOverlay.classList.remove('opacity-0');
+        hudOverlay.classList.add('opacity-100');
+    }, 10); 
+});
+
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize the tab visibility
     showInput('file');
-    // Attach the visual effect listener
     attachTapEffect();
-    // Attach the slider update listener
-    attachSliderListener();
 });

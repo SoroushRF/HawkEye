@@ -3,94 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>HAWKEYE | SCAN</title>
+    <title>Price Finder | Home</title>
+    
     <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}" type="image/png">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/phosphor-icons"></script>
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
 </head>
-<body class="bg-slate-950 text-white min-h-screen p-4 pt-10 font-sans">
+<body class="bg-gray-50 text-gray-800 min-h-screen p-4 pt-10 font-sans">
 
-    <div class="max-w-md mx-auto lg:max-w-4xl lg:pt-16">
+    <div class="max-w-md mx-auto lg:max-w-4xl lg:pt-12">
 
-        <header class="mb-8">
-            <h1 class="text-4xl font-extrabold tracking-tight text-blue-500 uppercase">HAWKEYE</h1>
-            <p class="text-sm text-emerald-400 font-mono">ARBITRAGE SYSTEM v1.0</p>
+        <header class="mb-8 text-center lg:text-left">
+            <h1 class="text-3xl font-bold tracking-tight text-blue-600">Price Finder</h1>
+            <p class="text-sm text-gray-500 mt-1">Find the best price for your items instantly.</p>
         </header>
 
-        <form id="scanForm" action="/scan" method="post" enctype="multipart/form-data">
+        <form id="scanForm" action="/report" method="post" enctype="multipart/form-data">
 
             <div class="flex flex-col lg:flex-row lg:space-x-8">
-                <div class="space-y-6 mb-8 p-4 border border-slate-700/50 rounded-lg bg-slate-900/50 lg:w-1/2 lg:mb-0">
-                    <h2 class="text-lg font-bold text-slate-200 border-b border-slate-800 pb-2 flex items-center"><i class="ph ph-gear-six text-emerald-400 mr-2"></i> CORE PARAMETERS</h2>
+
+                <div class="space-y-6 mb-8 p-6 rounded-2xl bg-white shadow-sm border border-gray-200 lg:w-1/2 lg:mb-0">
+                    <h2 class="text-lg font-bold text-gray-700 border-b border-gray-100 pb-3 flex items-center">
+                        <i class="ph ph-sliders-horizontal text-blue-500 mr-2 text-xl"></i> Search Settings
+                    </h2>
 
                     <div class="mb-4">
-                        <label for="platform" class="block text-sm font-semibold mb-2 text-slate-300">TARGET PLATFORM:</label>
-                        <div class="tactical-select-wrapper">
-                            <select id="platform" name="platform" class="tactical-select w-full border-2 border-blue-500 focus:border-emerald-400 p-3 rounded-lg shadow-inner focus:outline-none transition duration-200">
-                                <option value="eBay">eBay</option>
-                                <option value="Depop">Depop</option>
-                                <option value="Facebook Marketplace">FB Marketplace</option>
+                        <label for="platform" class="block text-sm font-medium mb-2 text-gray-600">Where do you want to sell?</label>
+                        <div class="friendly-select-wrapper">
+                            <select id="platform" name="platform" class="friendly-select w-full border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 p-3 rounded-lg transition duration-200 bg-gray-50">
+                                <option value="ebay">eBay</option>
+                                <option value="depop">Depop</option>
+                                <option value="fb_marketplace">Facebook Marketplace</option>
                             </select>
                         </div>
                     </div>
+                    
+                    <h3 class="text-md font-bold text-gray-700 border-b border-gray-100 pb-1 pt-2 flex items-center">
+                        <i class="ph ph-sparkle text-blue-500 mr-2"></i> Extra Options
+                    </h3>
 
                     <div>
-                        <label for="confidence" class="block text-sm font-semibold mb-2 text-slate-300 flex justify-between items-center">
-                            <span class="flex items-center"><i class="ph ph-chart-line-up mr-2"></i> AI SENSITIVITY:</span>
-                            <span id="confidenceValue" class="font-mono text-emerald-400">75%</span>
-                        </label>
-                        <input type="range" id="confidence" name="confidence" min="50" max="99" value="75" step="1" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer range-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <label class="block text-sm font-medium mb-3 text-gray-600">Search Speed:</label>
+                        <div class="flex space-x-4">
+                            <label class="flex items-center space-x-2 text-sm text-gray-700 cursor-pointer">
+                                <input type="radio" name="priority" value="quick" class="form-radio text-blue-600 focus:ring-blue-500" checked>
+                                <span>Fast Search</span>
+                            </label>
+                            <label class="flex items-center space-x-2 text-sm text-gray-700 cursor-pointer">
+                                <input type="radio" name="priority" value="deep" class="form-radio text-blue-600 focus:ring-blue-500">
+                                <span>Deep Search (Slower)</span>
+                            </label>
+                        </div>
                     </div>
+
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
+                        <label for="target_isolation" class="text-sm font-medium text-gray-600 flex items-center cursor-pointer">
+                            <i class="ph ph-crop text-gray-400 mr-2"></i> Auto-Crop Image
+                        </label>
+                        <input type="checkbox" id="target_isolation" name="target_isolation" value="true" class="form-checkbox h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                    </div>
+
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
+                        <label for="proximity_search" class="text-sm font-medium text-gray-600 flex items-center cursor-pointer">
+                            <i class="ph ph-map-pin text-gray-400 mr-2"></i> Check Local Prices
+                        </label>
+                        <input type="checkbox" id="proximity_search" name="proximity_search" value="true" class="form-checkbox h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                    </div>
+
                 </div>
 
                 <div class="lg:w-1/2">
-                    <div class="flex border-b border-slate-700 mb-6 lg:mt-0">
-                        <button type="button" id="tab-file" class="tactical-tab active" onclick="showInput('file')">
-                            <i class="ph ph-camera mr-1"></i> VISUAL SCAN
+                    
+                    <div class="flex border-b border-gray-200 mb-6 lg:mt-0">
+                        <button type="button" id="tab-file" class="friendly-tab active" onclick="showInput('file')">
+                            <i class="ph ph-camera mr-2"></i> Use Camera
+                        </button>
+                        <button type="button" id="tab-video" class="friendly-tab" onclick="showInput('video')">
+                            <i class="ph ph-link mr-2"></i> Use Link
                         </button>
                     </div>
 
                     <div id="scannerZoneContainer">
-                        <div id="fileInputPanel" class="mb-10 relative overflow-hidden bg-slate-900/50 h-64 shadow-inner shadow-blue-500/20 transition duration-300">
+                        
+                        <div id="fileInputPanel" class="mb-8 relative overflow-hidden bg-white h-64 transition duration-300 shadow-sm hover:shadow-md border-2 border-dashed border-gray-300 hover:border-blue-400 rounded-2xl group">
                             
-                            <div id="scannerBorder" class="absolute inset-0 border-4 border-dashed border-blue-500/50 rounded-xl pointer-events-none">
-                                <div class="absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 border-emerald-400"></div>
-                                <div class="absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 border-emerald-400"></div>
-                                <div class="absolute bottom-0 left-0 w-4 h-4 border-l-2 border-b-2 border-emerald-400"></div>
-                                <div class="absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 border-emerald-400"></div>
-                            </div>
-
                             <label for="file-upload" class="cursor-pointer flex flex-col items-center justify-center w-full h-full text-center p-4">
-                                <input id="file-upload" name="video" type="file" class="absolute inset-0 opacity-0 cursor-pointer" accept="video/*" required>
+                                <input id="file-upload" name="media_file" type="file" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*,video/*" required>
                                 
-                                <div class="relative z-10">
-                                    <i id="scannerIcon" class="ph ph-camera text-6xl text-emerald-400 mb-2 transition duration-300"></i>
-                                    <span id="scannerText" class="text-xl font-mono text-slate-300 tracking-wider transition duration-300 block">INITIATE LIVE SCAN</span>
-                                    <span id="scannerHint" class="text-sm text-blue-500 mt-1 font-mono transition duration-300 block">(Tap to upload video)</span>
+                                <div id="scannerVisuals" class="relative z-10 flex flex-col items-center justify-center w-full h-full">
+                                    <div class="bg-blue-50 p-4 rounded-full mb-3 group-hover:bg-blue-100 transition-colors">
+                                        <i id="scannerIcon" class="ph ph-upload-simple text-4xl text-blue-500"></i>
+                                    </div>
+                                    
+                                    <div class="flex items-center space-x-2">
+                                        <span id="scanStatusCheck" class="text-2xl text-green-500 hidden"><i class="ph ph-check-circle-fill"></i></span>
+                                        <span id="scannerText" class="text-lg font-semibold text-gray-700">Upload Photo or Video</span>
+                                    </div>
+                                    <span class="text-sm text-gray-400 mt-2">Tap to browse or take a picture</span>
                                 </div>
                             </label>
                         </div>
+
+                        <div id="videoInputPanel" class="hidden mb-8 p-6 bg-white border border-gray-200 rounded-2xl shadow-sm">
+                            <label for="video-url" class="block text-sm font-medium mb-2 text-gray-600">Paste Video Link</label>
+                            <input id="video-url" name="video_url" type="url" placeholder="e.g., https://youtube.com/..." class="w-full p-3 text-base bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 rounded-lg placeholder-gray-400 focus:outline-none transition">
+                            <p class="text-xs text-gray-400 mt-2">We accept YouTube, TikTok, or Instagram links.</p>
+                        </div>
+
                     </div>
                 </div>
             </div>
             
-            <button type="submit" onclick="document.getElementById('hudOverlay').classList.remove('hidden')" class="w-full py-4 text-xl font-bold uppercase tracking-widest rounded-lg bg-blue-600 hover:bg-blue-500 text-white transition duration-150 focus:outline-none focus:ring-4 focus:ring-blue-500/50 shadow-lg shadow-blue-900/50">
-             EXECUTE ANALYSIS
+            <button type="submit" class="w-full py-4 text-lg font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-200 transition-all duration-200 transform hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-blue-200">
+                Find Best Price
             </button>
+
         </form>
 
-        <div id="hudOverlay" class="hidden fixed inset-0 bg-slate-950/95 flex flex-col items-center justify-center z-50 p-8">
-            <i class="ph ph-circle-notch ph-spin text-7xl text-emerald-400 mb-6"></i>
-            <div class="w-full max-w-sm border-2 border-blue-500 p-4 font-mono text-emerald-400 text-left text-sm tracking-tighter bg-slate-900 shadow-xl shadow-blue-500/30">
-                <p class="hud-text mb-2">&gt; ESTABLISHING UPLINK...</p>
-                <p class="hud-text mb-2">&gt; PARSING AUDIO TRACK...</p>
-                <p class="hud-text">&gt; CALCULATING MARGINS...</p>
+        <div id="hudOverlay" class="hidden fixed inset-0 bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center z-50 p-8 opacity-0 transition-opacity duration-500">
+            <div class="flex space-x-2 mb-6">
+                <div class="w-4 h-4 bg-blue-500 rounded-full animate-bounce"></div>
+                <div class="w-4 h-4 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                <div class="w-4 h-4 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
             </div>
-            <p class="text-sm text-slate-400 mt-4 font-mono">STAND BY. TARGET LOCK IN PROGRESS...</p>
+            
+            <div class="text-center">
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Analyzing...</h3>
+                <p class="text-gray-500">We are looking for the best matches.</p>
+            </div>
         </div>
     
-    </div> 
+    </div>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>
