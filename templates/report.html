@@ -8,17 +8,17 @@
     <script src="https://unpkg.com/phosphor-icons"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body class="bg-slate-950 text-white min-h-screen p-4 pt-8 font-sans">
+<body class="bg-gray-50 text-gray-800 min-h-screen p-4 pt-10 font-sans">
 
     <div class="max-w-md mx-auto lg:max-w-4xl">
         
-        <div class="flex justify-between items-end border-b border-slate-800 pb-4 mb-6">
+        <div class="flex justify-between items-end border-b border-gray-200 pb-4 mb-6">
             <div>
-                <h1 class="text-3xl font-black text-white tracking-tight">MISSION REPORT</h1>
-                <p class="text-sm text-slate-500 font-mono">STRATEGY: <span class="text-blue-500 uppercase">{{ platform }}</span></p>
+                <h1 class="text-3xl font-black text-gray-800 tracking-tight">MISSION REPORT</h1>
+                <p class="text-sm text-gray-500 font-mono">STRATEGY: <span class="text-blue-500 uppercase">{{ platform }}</span></p>
             </div>
             <div class="text-right">
-                <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/50 px-3 py-1 rounded text-xs font-mono">
+                <span class="bg-emerald-100 text-emerald-600 border border-emerald-300 px-3 py-1 rounded text-xs font-mono">
                     TARGETS: {{ listings|length }}
                 </span>
             </div>
@@ -26,77 +26,77 @@
 
         <div class="space-y-6">
             {% for item in listings %}
-            <div class="bg-slate-900 rounded-xl overflow-hidden border border-slate-700 shadow-xl relative">
+            <div class="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-xl relative">
                 
                 <div class="relative h-56 bg-black">
                     <img src="{{ url_for('static', filename='products/' + item.image) }}" class="w-full h-full object-cover opacity-90">
                     
-                    <div class="absolute top-0 left-0 bg-black/60 backdrop-blur px-3 py-1 rounded-br-lg border-b border-r border-emerald-500/30">
-                        <p class="text-xs font-mono text-emerald-400">CONFIDENCE: HIGH</p>
+                    <div class="absolute top-0 left-0 bg-blue-100/60 backdrop-blur px-3 py-1 rounded-br-lg border-b border-r border-blue-300/30">
+                        <p class="text-xs font-mono text-blue-600">CONFIDENCE: HIGH</p>
                     </div>
-                    <div class="absolute bottom-2 right-2 bg-black/80 px-2 py-1 rounded text-xs text-slate-400 font-mono">
+                    <div class="absolute bottom-2 right-2 bg-gray-100/80 px-2 py-1 rounded text-xs text-gray-500 font-mono">
                         T-MINUS {{ item.timestamp }}s
                     </div>
                 </div>
 
                 <div class="p-5 space-y-4">
                     <div>
-                        <h2 class="text-xl font-bold text-white leading-tight">{{ item.title }}</h2>
+                        <h2 class="text-xl font-bold text-gray-800 leading-tight">{{ item.title }}</h2>
                     </div>
 
                     {% if item.voice_note %}
-                    <div class="bg-blue-900/20 p-3 rounded border-l-2 border-blue-500 flex items-start space-x-2">
-                        <i class="ph ph-microphone text-blue-400 mt-1"></i>
+                    <div class="bg-blue-50/20 p-3 rounded border-l-2 border-blue-500 flex items-start space-x-2">
+                        <i class="ph ph-microphone text-blue-600 mt-1"></i>
                         <div>
-                            <p class="text-[10px] text-blue-400 font-bold uppercase">Audio Intel</p>
-                            <p class="text-sm text-slate-300 italic">"{{ item.voice_note }}"</p>
+                            <p class="text-[10px] text-blue-600 font-bold uppercase">Audio Intel</p>
+                            <p class="text-sm text-gray-700 italic">"{{ item.voice_note }}"</p>
                         </div>
                     </div>
                     {% endif %}
 
                     <div class="grid grid-cols-3 gap-2 text-center my-4">
-                        <div class="bg-slate-950 p-2 rounded border border-slate-800">
-                            <p class="text-[10px] text-slate-500 uppercase">Quick</p>
-                            <p class="font-mono text-white text-lg">${{ item.prices.quick }}</p>
+                        <div class="bg-gray-50 p-2 rounded border border-gray-200">
+                            <p class="text-[10px] text-gray-500 uppercase">Quick</p>
+                            <p class="font-mono text-gray-800 text-lg">${{ item.prices.quick }}</p>
                         </div>
-                        <div class="bg-emerald-900/10 p-2 rounded border border-emerald-500/50 relative overflow-hidden">
+                        <div class="bg-emerald-50/10 p-2 rounded border border-emerald-300/50 relative overflow-hidden">
                             <div class="absolute top-0 right-0 w-2 h-2 bg-emerald-500 rounded-bl"></div>
-                            <p class="text-[10px] text-emerald-400 uppercase font-bold">Market</p>
-                            <p class="font-mono text-emerald-300 font-bold text-xl">${{ item.prices.market }}</p>
+                            <p class="text-[10px] text-emerald-600 uppercase font-bold">Market</p>
+                            <p class="font-mono text-emerald-700 font-bold text-xl">${{ item.prices.market }}</p>
                         </div>
-                        <div class="bg-slate-950 p-2 rounded border border-slate-800">
-                            <p class="text-[10px] text-slate-500 uppercase">Reach</p>
-                            <p class="font-mono text-white text-lg">${{ item.prices.reach }}</p>
+                        <div class="bg-gray-50 p-2 rounded border border-gray-200">
+                            <p class="text-[10px] text-gray-500 uppercase">Reach</p>
+                            <p class="font-mono text-gray-800 text-lg">${{ item.prices.reach }}</p>
                         </div>
                     </div>
 
                     <div>
-                        <p class="text-[10px] font-bold text-slate-500 uppercase mb-2">Listing Copy</p>
-                        <textarea class="w-full bg-slate-950 border border-slate-800 rounded p-3 text-sm text-slate-300 h-24 focus:outline-none focus:border-emerald-500 transition font-mono" readonly>{{ item.description }}</textarea>
+                        <p class="text-[10px] font-bold text-gray-500 uppercase mb-2">Listing Copy</p>
+                        <textarea class="w-full bg-gray-50 border border-gray-200 rounded p-3 text-sm text-gray-700 h-24 focus:outline-none focus:border-blue-500 transition font-mono" readonly>{{ item.description }}</textarea>
                     </div>
                     {% if item.sources %}
                     <div class="mt-4 pt-3 border-t border-slate-800">
-                        <p class="text-[10px] font-bold text-slate-500 uppercase mb-2 flex items-center">
+                        <p class="text-[10px] font-bold text-gray-500 uppercase mb-2 flex items-center">
                             <i class="ph ph-trend-up mr-1"></i> Verify Live Prices
                         </p>
                         <div class="flex flex-col space-y-2">
                             
-                            <a href="{{ item.sources[0] }}" target="_blank" class="flex items-center bg-slate-800 hover:bg-slate-700 p-2 rounded border border-slate-700 hover:border-blue-500 transition group">
+                            <a href="{{ item.sources[0] }}" target="_blank" class="flex items-center bg-gray-100 hover:bg-gray-200 p-2 rounded border border-gray-200 hover:border-blue-500 transition group">
                                 <i class="ph ph-shopping-cart text-blue-500 mr-2"></i>
                                 <div>
-                                    <p class="text-[10px] text-slate-400 font-bold uppercase">eBay Sold History</p>
+                                    <p class="text-[10px] text-gray-600 font-bold uppercase">eBay Sold History</p>
                                     <p class="text-xs text-blue-400 truncate w-48">View confirmed sales</p>
                                 </div>
-                                <i class="ph ph-arrow-square-out ml-auto text-slate-500 group-hover:text-white"></i>
+                                <i class="ph ph-arrow-square-out ml-auto text-gray-500 group-hover:text-gray-800"></i>
                             </a>
 
-                            <a href="{{ item.sources[1] }}" target="_blank" class="flex items-center bg-slate-800 hover:bg-slate-700 p-2 rounded border border-slate-700 hover:border-emerald-500 transition group">
+                            <a href="{{ item.sources[1] }}" target="_blank" class="flex items-center bg-gray-100 hover:bg-gray-200 p-2 rounded border border-gray-200 hover:border-emerald-500 transition group">
                                 <i class="ph ph-google-logo text-emerald-500 mr-2"></i>
                                 <div>
-                                    <p class="text-[10px] text-slate-400 font-bold uppercase">Google Shopping</p>
+                                    <p class="text-[10px] text-gray-600 font-bold uppercase">Google Shopping</p>
                                     <p class="text-xs text-emerald-400 truncate w-48">Compare active listings</p>
                                 </div>
-                                <i class="ph ph-arrow-square-out ml-auto text-slate-500 group-hover:text-white"></i>
+                                <i class="ph ph-arrow-square-out ml-auto text-gray-500 group-hover:text-gray-800"></i>
                             </a>
 
                         </div>

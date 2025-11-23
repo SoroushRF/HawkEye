@@ -24,10 +24,10 @@ def home():
 @app.route('/scan', methods=['POST'])
 def scan_endpoint():
     # 1. Validation
-    if 'video' not in request.files:
+    if 'media_file' not in request.files:
         return "No video uploaded", 400
-    
-    video = request.files['video']
+
+    video = request.files['media_file']
     
     # Capture inputs
     platform = request.form.get('platform', 'eBay')
