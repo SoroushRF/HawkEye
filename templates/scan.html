@@ -23,25 +23,13 @@
 
         <header class="mb-8 text-center lg:text-left">
             <h1 class="text-3xl font-bold tracking-tight text-blue-600">HAWKEYE</h1>
-            <p class="text-sm text-gray-500 mt-1">Find the best price for your items instantly.3</p>
+            <p class="text-sm text-gray-500 mt-1">Find the best price for your items instantly.</p>
         </header>
 
         <!-- Change action="/report" to action="/scan" -->
         <form id="scanForm" action="/scan" method="post" enctype="multipart/form-data">
 
             <div class="flex flex-col lg:flex-row lg:space-x-8">
-                <!-- RADAR SCANNER OVERLAY -->
-<div id="hudOverlay" class="hidden fixed inset-0 bg-white/95 backdrop-blur-md flex flex-col items-center justify-center z-50 transition-opacity duration-500 opacity-0">
-    
-    <!-- The Spinning Radar -->
-    <div class="radar-spinner"></div>
-    
-    <!-- The Text -->
-    <div class="text-center mt-4">
-        <h3 class="text-2xl font-bold text-gray-800 mb-2 tracking-tight">ANALYZING</h3>
-        <p class="scanning-text text-sm">DETECTING OBJECTS...</p>
-    </div>
-</div>
 
                 <div class="space-y-6 mb-8 p-6 rounded-2xl bg-white shadow-sm border border-gray-200 lg:w-1/2 lg:mb-0">
                     <h2 class="text-lg font-bold text-gray-700 border-b border-gray-100 pb-3 flex items-center">

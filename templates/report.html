@@ -29,23 +29,21 @@
             <div class="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-xl relative">
                 
                 <!-- PRODUCT IMAGE CONTAINER -->
-                <div class="relative h-64 bg-gray-100 group cursor-zoom-in">
-                    <!-- Image Source with ONCLICK trigger -->
-                    <img src="{{ url_for('static', filename='products/' + item.image) }}" 
-                         onclick="openCinemaMode(this.src)"
-                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                <div class="relative h-64 bg-gray-100 group">
+                    <!-- Image Source -->
+                    <img src="{{ url_for('static', filename='products/' + item.image) }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
 
-                    <!-- DOWNLOAD BUTTON (Protected from click propagation) -->
+                    <!-- NEW: DOWNLOAD BUTTON (Top Right) -->
+                    <!-- Matches the Friendly Light Theme (White background, Blue icon) -->
                     <a href="{{ url_for('static', filename='products/' + item.image) }}" 
                        download="{{ item.title|replace(' ', '_') }}.jpg"
-                       onclick="event.stopPropagation()"
                        class="absolute top-3 right-3 bg-white/90 hover:bg-blue-50 text-blue-600 p-2.5 rounded-full shadow-md border border-gray-200 transition-all duration-200 transform hover:scale-110 z-10 flex items-center justify-center"
                        title="Download Image">
                         <i class="ph ph-download-simple text-lg"></i>
                     </a>
 
-                    <!-- Timestamp Badge -->
-                    <div class="absolute bottom-3 right-3 bg-gray-900/80 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm pointer-events-none">
+                    <!-- Timestamp Badge (Bottom Right) -->
+                    <div class="absolute bottom-3 right-3 bg-gray-900/80 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm">
                         <p class="text-xs font-medium text-white flex items-center">
                             <i class="ph ph-clock mr-1.5"></i> {{ item.timestamp }}s
                         </p>
@@ -124,34 +122,6 @@
             Initiate New Scan
         </a>
     </div>
-
-    <!-- CINEMA MODE OVERLAY (Hidden by default) -->
-    <div id="imageViewer" onclick="closeCinemaMode()" class="fixed inset-0 z-50 bg-black/95 backdrop-blur-sm flex items-center justify-center p-4">
-        <img id="cinemaImage" src="" class="max-w-full max-h-full object-contain rounded-lg shadow-2xl">
-        <p class="absolute bottom-10 text-white/50 text-sm font-mono">Tap anywhere to close</p>
-    </div>
-
-    <!-- CINEMA MODE LOGIC -->
-    <script>
-        const viewer = document.getElementById('imageViewer');
-        const cinemaImg = document.getElementById('cinemaImage');
-
-        function openCinemaMode(src) {
-            // 1. Set the image
-            cinemaImg.src = src;
-            // 2. Show the overlay (Fade in)
-            viewer.classList.add('active');
-        }
-
-        function closeCinemaMode() {
-            // 1. Fade out
-            viewer.classList.remove('active');
-            // 2. Clear src after delay to prevent 'flash' of old image next time
-            setTimeout(() => {
-                cinemaImg.src = '';
-            }, 300);
-        }
-    </script>
 
 </body>
 </html>

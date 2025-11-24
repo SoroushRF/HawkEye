@@ -38,7 +38,7 @@ def scan_endpoint():
     video.save(video_path)
     print(f"✅ Video saved to: {video_path}")
 
-    # 3. PANIC BUTTON (Demo Mode)
+    # 3. PANIC BUTTON
     if DEMO_MODE:
         import json
         import time
@@ -57,47 +57,26 @@ def scan_endpoint():
     # 5. Run Video Logic & BUILD LINKS
     print("✂️ Processing Items...")
     
-    # Used to prevent duplicate timestamps
-    seen_timestamps = set()
+    # DEBUG: Print the whole list to see timestamps
+    print(f"🔍 RAW AI DATA: {listings}")
 
     for i, item in enumerate(listings):
-        title = item.get('title', 'Unknown_Item')
-        timestamp = float(item.get('timestamp', 0))
+        print(f"   Processing Item {i+1}: {item.get('title')}")
         
-        print(f"   Processing Item {i+1}: {title} at {timestamp}s")
-        
-        # --- TIMESTAMP DE-DUPLICATION ---
-        # If this timestamp was already used (e.g. two items at 0:05), 
-        # bump this one by 1.5 seconds to try and find a distinct frame.
-        if int(timestamp) in seen_timestamps:
-            print(f"      ⚠️ Duplicate timestamp detected. Shifting {timestamp} -> {timestamp + 1.5}")
-            timestamp += 1.5
-        
-        seen_timestamps.add(int(timestamp))
-        
-        # --- UNIQUE FILENAME GENERATION ---
-        # We append the index 'i' to the name. 
-        # This prevents "Shirt" overwriting the previous "Shirt".
-        clean_title = "".join(x for x in title if x.isalnum())[:10]
-        unique_name_for_file = f"{i}_{clean_title}"
-
         # A. Crop Image
         image_name = crop_frame(
             video_path, 
-            timestamp, 
+            item.get('timestamp', 0), 
             app.config['PRODUCT_FOLDER'], 
-            unique_name_for_file 
+            item.get('title', 'Unknown_Item')
         )
         
-        # Assign the unique image to this specific item
+        # CRITICAL FIX: Force unique assignment
         item['image'] = image_name
-        # Update timestamp in display to match the shifted one
-        item['timestamp'] = round(timestamp, 1)
-
         print(f"      -> Generated Image: {image_name}")
 
         # B. BUILD LIVE MARKET LINKS
-        safe_query = urllib.parse.quote(title)
+        safe_query = urllib.parse.quote(item['title'])
         
         ebay_link = f"https://www.ebay.com/sch/i.html?_nkw={safe_query}&LH_Sold=1&LH_Complete=1"
         google_link = f"https://www.google.com/search?q={safe_query}&tbm=shop"
