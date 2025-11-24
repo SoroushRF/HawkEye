@@ -1,3 +1,5 @@
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+
 # HawkEye: AI-Powered Video Analysis 🦅
 
 HawkEye is a tool that turns an inventory into cash. By analyzing a single video of multiple items, it identifies products, detects condition issues, it saves resellers hours of manual listing work.
@@ -8,9 +10,22 @@ HawkEye was born out of the **CSHub Local Day Hack**, an intense **12-hour codin
 
 A core requirement of the hackathon was to integrate the powerful **Google Gemini API**, pushing us to rapidly learn and implement its capabilities. This project is the result of that effort, showcasing what can be built and deployed in just half a day.
 
+### 👥 Our Team
+
+*   **Soroush - Backend Lead**
+    *   Architected the core backend using **Flask**, creating a robust server to handle all application logic.
+    *   Engineered the **Google Gemini** integration, enabling the multi-modal analysis that serves as the project's cognitive engine.
+    *   Developed the **FFmpeg** video processing pipeline, responsible for efficient frame extraction and precise timestamping.
+    *   Orchestrated the containerization with **Docker** and managed the final deployment on **Render**.
+
+*   **Parsa - Frontend Lead**
+    *   Designed and implemented the "Tactical" UI/UX with **Tailwind CSS**, focusing on a clean and intuitive user experience.
+    *   Built the responsive scanning interface, including the signature "Radar" animation and a "Cinema Mode" for enhanced usability.
+    *   Optimized the frontend JavaScript for **iOS PWA compatibility**, resolving critical touch event and file input challenges on mobile devices.
+
 ### 🚀 The Power of Google Gemini
 
-We leveraged Google Gemini to empower HawkEye with multi-modal intelligence. Gemini (1.5 Flash API) synthesizes uploaded audiovisual and static media to:
+We leveraged Google Gemini to empower HawkEye with multi-modal intelligence. Gemini (2.5 Flash API) synthesizes uploaded audiovisual and static media to:
 
 *   **Classify inventory** (e.g., "Vintage Levi's 501 Jeans")
 *   **Extract auditory condition reports** (e.g., "Missing button on cuff")
@@ -85,7 +100,7 @@ Follow these instructions to get a copy of the project up and running on your lo
 
 1.  **Video Upload**: The user uploads a video file through the Flask web interface.
 2.  **Frame Extraction**: The `backend_video.py` script uses **FFmpeg** to extract frames from the video at a rate of one frame per second.
-3.  **AI Analysis**: The extracted frames are passed to the `backend_ai.py` script, which communicates with the **Google Gemini Pro Vision API**.
+3.  **AI Analysis**: The extracted frames are passed to the `backend_ai.py` script, which communicates with the **Google Gemini API**.
 4.  **Content Generation**: The Gemini model analyzes the sequence of frames and generates a descriptive text summary of the video's content.
 5.  **Display Results**: The generated text is displayed back to the user on the web interface.
 
