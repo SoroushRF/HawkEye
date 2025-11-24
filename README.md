@@ -2,6 +2,22 @@
 
 HawkEye is a tool that turns an inventory into cash. By analyzing a single video of multiple items, it identifies products, detects condition issues, it saves resellers hours of manual listing work.
 
+### 🏆 A 12-Hour Hackathon Project
+
+HawkEye was born out of the **CSHub Local Day Hack**, an intense **12-hour coding competition**. The challenge was to build a project from zero to a fully functional, demo-ready product within the strict time limit.
+
+A core requirement of the hackathon was to integrate the powerful **Google Gemini API**, pushing us to rapidly learn and implement its capabilities. This project is the result of that effort, showcasing what can be built and deployed in just half a day.
+
+### 🚀 The Power of Google Gemini
+
+We leveraged Google Gemini to empower HawkEye with multi-modal intelligence. Gemini (1.5 Flash API) synthesizes uploaded audiovisual and static media to:
+
+*   **Classify inventory** (e.g., "Vintage Levi's 501 Jeans")
+*   **Extract auditory condition reports** (e.g., "Missing button on cuff")
+*   **Appraise market value** (by scraping live pricing data)
+
+Gemini serves as the cognitive engine bridging visual inputs and resale analytics, interpreting multimedia streams instantly to automate listing operations.
+
 ### 🛠️ Tech Stack
 
 | Category | Technologies |
