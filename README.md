@@ -32,8 +32,8 @@ A core requirement of the hackathon was to integrate the powerful **Google Gemin
     *   Orchestrated the containerization with **Docker** and managed the final deployment on **Render**.
 
 *   **Parsa - Frontend Lead**
-    *   Designed and implemented the "Tactical" UI/UX with **Tailwind CSS**, focusing on a clean and intuitive user experience.
-    *   Built the responsive scanning interface, including the signature "Radar" animation and a "Cinema Mode" for enhanced usability.
+    *   Designed and implemented the "Simplist" UI/UX with **Tailwind CSS**, focusing on a clean and intuitive user experience.
+    *   Built the responsive scanning interface, and a "Cinema Mode" for enhanced usability and image visibility.
     *   Optimized the frontend JavaScript for **iOS PWA compatibility**, resolving critical touch event and file input challenges on mobile devices.
 
 ### 🚀 The Power of Google Gemini
