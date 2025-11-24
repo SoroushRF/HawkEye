@@ -2,7 +2,7 @@
 
 # HawkEye: AI-Powered Video Analysis 🦅
 
-HawkEye is a tool that turns an inventory into cash. By analyzing a single video of multiple items, it identifies products, detects condition issues, it saves resellers hours of manual listing work.
+**HawkEye** is a tool that turns an inventory into cash. By analyzing a single video of multiple items, it identifies products, detects condition issues, it saves resellers hours of manual listing work.
 
 ### 📋 Table of Contents
 
@@ -96,15 +96,36 @@ Follow these instructions to get a copy of the project up and running on your lo
     The application will be available at `http://localhost:5000`.
 
 4.  **Run locally without Docker:**
-    Install the required Python packages and FFmpeg:
+
+    **a. Install Dependencies:**
+    First, install the required Python packages from `requirements.txt`.
     ```sh
-    # Install Python dependencies
     pip install -r requirements.txt
+    ```
 
-    # Install FFmpeg (example for Debian/Ubuntu)
-    sudo apt-get update && sudo apt-get install ffmpeg
+    **b. Install FFmpeg:**
+    Next, you must install FFmpeg, a core dependency for video processing. Please follow the instructions for your operating system.
 
-    # Run the Flask app
+    *   **On macOS (using Homebrew):**
+        ```sh
+        brew install ffmpeg
+        ```
+    *   **On Windows (using Chocolatey or Scoop):**
+        ```sh
+        # Using Chocolatey package manager
+        choco install ffmpeg
+
+        # OR, using Scoop package manager
+        scoop install ffmpeg
+        ```
+    *   **On Linux (Debian/Ubuntu):**
+        ```sh
+        sudo apt-get update && sudo apt-get install ffmpeg
+        ```
+
+    **c. Run the Application:**
+    Once all dependencies are installed, run the Flask app:
+    ```sh
     python app.py
     ```
     The application will be available at `http://127.0.0.1:5000`.
