@@ -31,41 +31,37 @@ function showInput(type) {
 
 /**
  * Updates the visual status (Checkmark vs Upload Icon).
- * FIXED: Now turns green for ANY file detection, ignoring iOS MIME type bugs.
+ * BULLETPROOF VERSION: If a file exists, it turns GREEN. No complex checks.
  */
 function updateScanStatus(file) {
     const checkIcon = document.getElementById('scanStatusCheck');
     const scannerText = document.getElementById('scannerText');
     const scannerIcon = document.getElementById('scannerIcon');
 
-    // 1. Check if a file actually exists
+    // SIMPLEST LOGIC POSSIBLE: Do we have a file?
     if (file) {
-        // --- VISUAL SUCCESS STATE (GREEN) ---
-        // We do this immediately so the user knows it worked
+        // 1. Show Green Checkmark
         checkIcon.classList.remove('hidden');
+        
+        // 2. Turn Text Green
         scannerText.classList.add('text-green-600');
         scannerText.classList.remove('text-gray-700');
-
-        // 2. DETECT TYPE (Robust iOS Fallback)
-        // iOS often sends empty type for .mov files. We check name extension as backup.
-        const fileType = file.type || ''; 
-        const fileName = file.name || '';
         
-        const isVideo = fileType.startsWith('video/') || 
-                        fileType === 'video/quicktime' || 
-                        /\.(mp4|mov|avi|mkv|wmv|qt)$/i.test(fileName);
+        // 3. Update Icon & Text
+        // We do a basic name check just for the icon, but the STATE is always green now.
+        const fileName = file.name || '';
+        const isVideo = file.type.startsWith('video/') || /\.(mp4|mov|avi|mkv|wmv|qt)$/i.test(fileName);
 
         if (isVideo) {
-            scannerText.textContent = 'Video Received!';
+            scannerText.textContent = 'Video Ready!';
             scannerIcon.className = 'ph ph-video-camera text-4xl text-green-500'; 
         } else {
-            // Default to image if it's not clearly a video
-            scannerText.textContent = 'Photo Received!';
+            scannerText.textContent = 'Image Ready!';
             scannerIcon.className = 'ph ph-image text-4xl text-green-500'; 
         }
         
     } else {
-        // --- RESET TO DEFAULT STATE (BLUE) ---
+        // RESET TO DEFAULT
         checkIcon.classList.add('hidden');
         scannerText.textContent = 'Upload Photo or Video';
         scannerText.classList.remove('text-green-600');
@@ -80,7 +76,7 @@ function attachTapEffect() {
     const fileInput = document.getElementById('file-upload');
     const filePanel = document.getElementById('fileInputPanel');
     
-    // Visual flash when clicking (Feedback)
+    // Visual flash when clicking
     fileInput.addEventListener('click', function() {
         filePanel.classList.add('border-blue-500', 'bg-blue-50');
         setTimeout(() => {
@@ -91,50 +87,44 @@ function attachTapEffect() {
     // Handle file selection
     fileInput.addEventListener('change', function() {
         if (this.files && this.files.length > 0) {
-            // Force a small delay to ensure iOS UI updates
-            setTimeout(() => {
-                updateScanStatus(this.files[0]);
-            }, 50);
+            // Instant update
+            updateScanStatus(this.files[0]); 
         } else {
             updateScanStatus(null); 
         }
     });
 }
 
-// Loading Screen Animation (iOS PWA Safe Version)
-// We define this OUTSIDE of other functions to ensure it attaches on load
+// FORCE LOADING SCREEN ON IPHONE
 function attachFormSubmit() {
     const form = document.getElementById('scanForm');
     if (!form) return;
 
     form.addEventListener('submit', function(e) {
-        // 1. STOP the immediate send. We need to show the UI first.
+        // 1. PAUSE submission
         e.preventDefault();
         
         const hudOverlay = document.getElementById('hudOverlay');
         
-        // 2. Show the loading screen
+        // 2. Force the overlay to appear
         hudOverlay.classList.remove('hidden');
-        // Force a browser reflow (paint frame)
+        // This line forces the browser to paint the new pixels immediately
         void hudOverlay.offsetWidth; 
 
         // 3. Fade it in
-        requestAnimationFrame(() => {
-            hudOverlay.classList.remove('opacity-0');
-            hudOverlay.classList.add('opacity-100');
-        });
+        hudOverlay.classList.remove('opacity-0');
+        hudOverlay.classList.add('opacity-100');
 
-        // 4. WAIT 100ms for the iPhone to render the new UI, THEN submit.
-        // This is the "magic" fix for iOS PWA freezing
+        // 4. WAIT 100ms, THEN submit. 
+        // This gives the iPhone GPU time to render the overlay before the network freezes it.
         setTimeout(() => {
             form.submit();
-        }, 100); 
+        }, 150); 
     });
 }
 
-// Initialize on Load
 document.addEventListener('DOMContentLoaded', () => {
     showInput('file');
     attachTapEffect();
-    attachFormSubmit(); // Attach the form listener
+    attachFormSubmit(); 
 });
