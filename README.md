@@ -8,6 +8,8 @@ HawkEye is a tool that turns an inventory into cash. By analyzing a single video
 
 HawkEye was born out of the **CSHub Local Day Hack**, an intense **12-hour coding competition**. The challenge was to build a project from zero to a fully functional, demo-ready product within the strict time limit.
 
+A core requirement was to integrate the powerful **Google Gemini API**, which we used not only for the app's core functionality but also as an **agentic AI assistant**. We leveraged the **Gemini CLI** throughout the development cycle to accelerate debugging, write boilerplate code, pushing to GitHub, and rapidly prototype solutions, which proved instrumental in meeting the tight deadline. This project is the result of that effort, showcasing what can be built and deployed in just half a day.
+
 A core requirement of the hackathon was to integrate the powerful **Google Gemini API**, pushing us to rapidly learn and implement its capabilities. This project is the result of that effort, showcasing what can be built and deployed in just half a day.
 
 ### 👥 Our Team
