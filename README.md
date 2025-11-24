@@ -4,6 +4,17 @@
 
 HawkEye is a tool that turns an inventory into cash. By analyzing a single video of multiple items, it identifies products, detects condition issues, it saves resellers hours of manual listing work.
 
+### 📋 Table of Contents
+
+1.  [A 12-Hour Hackathon Project](#-a-12-hour-hackathon-project)
+2.  [Our Team](#-our-team)
+3.  [The Power of Google Gemini](#-the-power-of-google-gemini)
+4.  [Tech Stack](#️-tech-stack)
+5.  [Key Features](#key-features)
+6.  [Getting Started](#getting-started)
+7.  [How It Works](#how-it-works)
+8.  [Deployment](#deployment)
+
 ### 🏆 A 12-Hour Hackathon Project
 
 HawkEye was born out of the **CSHub Local Day Hack**, an intense **12-hour coding competition**. The challenge was to build a project from zero to a fully functional, demo-ready product within the strict time limit.
