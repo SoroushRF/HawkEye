@@ -31,6 +31,7 @@ function showInput(type) {
 
 /**
  * Updates the visual status (Checkmark vs Upload Icon).
+ * PATCHED: Now supports iOS .mov and QuickTime video detection.
  */
 function updateScanStatus(file) {
     const checkIcon = document.getElementById('scanStatusCheck');
@@ -41,8 +42,13 @@ function updateScanStatus(file) {
         // 1. Show the Stable Checkmark
         checkIcon.classList.remove('hidden');
         
-        // 2. Detect Type and Change Text/Main Icon
-        if (file.type.startsWith('video/')) {
+        // 2. DETECT TYPE (Robust iOS Check)
+        // Check MIME type OR file extension
+        const isVideo = file.type.startsWith('video/') || 
+                        file.type === 'video/quicktime' || 
+                        /\.(mp4|mov|avi|mkv|wmv)$/i.test(file.name);
+
+        if (isVideo) {
             scannerText.textContent = 'Video Received!';
             scannerIcon.className = 'ph ph-video-camera text-4xl text-green-500'; 
         } else {
@@ -89,15 +95,30 @@ function attachTapEffect() {
 }
 
 // Loading Screen Animation
-document.getElementById('scanForm').addEventListener('submit', function(e) {
+// Loading Screen Animation (iOS PWA Safe Version)
+const form = document.getElementById('scanForm');
+
+form.addEventListener('submit', function(e) {
+    // 1. STOP the immediate send. We need to show the UI first.
+    e.preventDefault();
+    
     const hudOverlay = document.getElementById('hudOverlay');
     
+    // 2. Show the loading screen
     hudOverlay.classList.remove('hidden');
+    // Force a browser reflow (paint frame)
+    void hudOverlay.offsetWidth; 
 
-    setTimeout(() => {
+    // 3. Fade it in
+    requestAnimationFrame(() => {
         hudOverlay.classList.remove('opacity-0');
         hudOverlay.classList.add('opacity-100');
-    }, 10); 
+    });
+
+    // 4. WAIT 100ms for the iPhone to render the new UI, THEN submit.
+    setTimeout(() => {
+        form.submit();
+    }, 100); 
 });
 
 
