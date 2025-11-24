@@ -1,105 +1,78 @@
-# HawkEye
+# HawkEye: AI-Powered Video Analysis 🦅
 
-HawkEye is a small web-backed Python project that provides a browser UI and video/AI backend components. The backend extracts items from short video clips using Google's Gemini model and builds quick marketplace links and thumbnail crops for each detected item.
+HawkEye is a tool that turns an inventory into cash. By analyzing a single video of multiple items, it identifies products, detects condition issues, it saves resellers hours of manual listing work.
 
-This README explains how to run the project locally (via a VS Code venv), what environment variables are required, and key implementation notes.
+### 🛠️ Tech Stack
 
-Table of contents
-- Quickstart (VS Code / local)
-- Docker (optional)
-- Configuration (.env and API key)
-- Requirements
-- Key files
-- Project layout
-- Notes & troubleshooting
-- License
+| Category | Technologies |
+| :--- | :--- |
+| **Backend** | ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white) ![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white) |
+| **AI & Data** | ![Google Gemini](https://img.shields.io/badge/Google_Gemini-4A90E2?style=for-the-badge&logo=google-gemini&logoColor=white) ![FFmpeg](https://img.shields.io/badge/FFmpeg-007800?style=for-the-badge&logo=ffmpeg&logoColor=white) |
+| **Frontend** | ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white) ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white) |
+| **DevOps** | ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white) ![Gunicorn](https://img.shields.io/badge/Gunicorn-499848?style=for-the-badge&logo=gunicorn&logoColor=white) |
 
-Quickstart (VS Code / local)
-1. Open this repository in VS Code.
+### Key Features
 
-2. Create and activate a virtual environment (in the integrated terminal):
-   - Create venv:
-     python -m venv .venv
-   - Activate:
-     - macOS / Linux:
-       source .venv/bin/activate
-     - Windows (PowerShell):
-       .venv\Scripts\Activate.ps1
-     - Windows (cmd):
-       .venv\Scripts\activate.bat
+*   **Easy Video Upload**: A simple, user-friendly interface for uploading video files.
+*   **Advanced AI Analysis**: Leverages Google's powerful Gemini 2.5 Flash model to understand video content.
+*   **Frame-by-Frame Processing**: Uses FFmpeg to efficiently extract and analyze video frames.
+*   **Text-Based Summaries**: Generates clear and concise descriptions of the video's content.
+*   **Containerized & Deployable**: Fully containerized with Docker for easy deployment on any platform.
 
-   In VS Code, select the created interpreter (.venv) from the Command Palette → Python: Select Interpreter so the terminal uses the venv automatically.
+### Getting Started
 
-3. Install dependencies:
-   pip install -r requirements.txt
+Follow these instructions to get a copy of the project up and running on your local machine.
 
-4. Create a .env file (see "Configuration" below), then run the app:
-   python app.py
+#### Prerequisites
 
-5. Open the app in your browser:
-   http://127.0.0.1:5000/
+*   Python 3.9+
+*   Docker (Recommended)
+*   An API key for Google Gemini
 
-(If you run the app inside Docker / with Gunicorn, the container uses port 10000 — see the Docker section.)
+#### Installation
 
-Docker (optional)
-A Dockerfile is included and installs ffmpeg and Python dependencies, then runs Gunicorn serving app:app on port 10000.
+1.  **Clone the repository:**
+    ```sh
+    git clone https://github.com/SoroushRF/HawkEye.git
+    cd HawkEye
+    ```
 
-Build and run:
-- Build:
-  docker build -t hawkeye:latest .
-- Run:
-  docker run -d -p 10000:10000 --name hawkeye hawkeye:latest
-- Open:
-  http://127.0.0.1:10000/
+2.  **Set up your environment variables:**
+    Create a file named `.env` in the root of the project and add your Google Gemini API key:
+    ```env
+    GOOGLE_API_KEY="YOUR_API_KEY_HERE"
+    ```
 
-Configuration (.env and API key)
-- Create a .env file in the repository root.
-- Add your Gemini API key (the app expects GEMINI_API_KEY):
-  GEMINI_API_KEY=your_api_key_here
+3.  **Build and run with Docker (Recommended):**
+    Ensure Docker is running on your machine, then execute:
+    ```sh
+    docker build -t hawkeye-app .
+    docker run -p 5000:10000 -v $(pwd):/app hawkeye-app
+    ```
+    The application will be available at `http://localhost:5000`.
 
-Important:
-- backend_ai.py uses Google's GenAI client and is configured to call the gemini-2.5-flash model. Provide your own API key; the app will exit if GEMINI_API_KEY is not set.
-- backend_video.py requires ffmpeg for video frame extraction. If running locally (not in Docker), install ffmpeg on your host (apt, brew, or from ffmpeg.org).
+4.  **Run locally without Docker:**
+    Install the required Python packages and FFmpeg:
+    ```sh
+    # Install Python dependencies
+    pip install -r requirements.txt
 
-Requirements
-- Python 3.9+ (project uses python:3.9-slim in Dockerfile)
-- pip
-- ffmpeg (system binary) for local video processing
-- Python packages listed in requirements.txt:
-  pip install -r requirements.txt
+    # Install FFmpeg (example for Debian/Ubuntu)
+    sudo apt-get update && sudo apt-get install ffmpeg
 
-Key files
-- app.py — Flask application and main entrypoint. Running python app.py serves the web UI on 0.0.0.0:5000 by default.
-- backend_ai.py — Handles uploading video to Gemini and generating the JSON report. Uses model: gemini-2.5-flash.
-- backend_video.py — Video processing utilities (frame cropping, thumbnails). Depends on ffmpeg.
-- requirements.txt — Python dependencies.
-- Dockerfile — Builds an image with ffmpeg and runs Gunicorn (app:app) on port 10000.
-- templates/ and static/ — Frontend HTML/CSS/JS and uploaded/derived media folders.
+    # Run the Flask app
+    python app.py
+    ```
+    The application will be available at `http://127.0.0.1:5000`.
 
-Project layout (important paths)
-- app.py
-- backend_ai.py
-- backend_video.py
-- requirements.txt
-- Dockerfile
-- templates/ (HTML)
-- static/
-  - uploads/ (incoming videos)
-  - products/ (generated thumbnails)
+### How It Works
 
-Notes & troubleshooting
-- Missing API key: backend_ai.py loads GEMINI_API_KEY from .env and will exit if not found. Create .env with your key before running.
-- FFmpeg: If you get errors when crops or frames are generated, ensure ffmpeg is installed and available in PATH.
-- Local dev vs Docker:
-  - Local quick dev: python app.py → http://127.0.0.1:5000/
-  - Docker (production-like): gunicorn app:app → container exposes port 10000 (http://127.0.0.1:10000/)
+1.  **Video Upload**: The user uploads a video file through the Flask web interface.
+2.  **Frame Extraction**: The `backend_video.py` script uses **FFmpeg** to extract frames from the video at a rate of one frame per second.
+3.  **AI Analysis**: The extracted frames are passed to the `backend_ai.py` script, which communicates with the **Google Gemini Pro Vision API**.
+4.  **Content Generation**: The Gemini model analyzes the sequence of frames and generates a descriptive text summary of the video's content.
+5.  **Display Results**: The generated text is displayed back to the user on the web interface.
 
-Security & privacy
-- Do not commit your .env with real API keys. Add .env to .gitignore.
-- Video files uploaded to static/uploads are stored locally; handle sensitive content accordingly.
+### Deployment
 
-Acknowledgements
-- Gemini model: this repository uses the gemini-2.5-flash model in backend_ai.py for video understanding and JSON generation.
-
-License
-- See repository LICENSE file for terms.
+This application is containerized with Docker and can be easily deployed on cloud services like Render, Heroku, or AWS. The included `Dockerfile` and `gunicorn` dependency are configured for a production environment. On Render, the app will automatically be served on port 10000.
