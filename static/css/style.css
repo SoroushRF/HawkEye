@@ -89,3 +89,11 @@ body {
 input:focus, select:focus, button:focus {
     outline: none;
 }
+
+input, select {
+    border: 1px solid var(--border-light);
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: border-color 200ms ease;
+}

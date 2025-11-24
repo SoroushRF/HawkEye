@@ -3,6 +3,7 @@ import urllib.parse
 from flask import Flask, render_template, request
 from backend_video import crop_frame
 from backend_ai import analyze_video_feed
+import datetime
 
 app = Flask(__name__)
 
@@ -32,21 +33,21 @@ def scan_endpoint():
     # Capture inputs
     platform = request.form.get('platform', 'eBay')
     
-    # 2. Save Video Locally (This defines video_path!)
+    # 2. Save Video Locally
     video_path = os.path.join(app.config['UPLOAD_FOLDER'], video.filename)
     video.save(video_path)
     print(f"✅ Video saved to: {video_path}")
 
-    # 3. PANIC BUTTON (Safety Net)
+    # 3. PANIC BUTTON
     if DEMO_MODE:
         import json
         import time
         time.sleep(3)
-        # Ensure dummy_data.json exists if you use this!
         with open('dummy_data.json') as f:
-            return render_template('report.html', listings=json.load(f), platform=platform)
+            scan_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            return render_template('report.html', listings=json.load(f), platform=platform, scan_date=scan_date)
 
-    # 4. Run AI Logic (The Brain)
+    # 4. Run AI Logic
     try:
         listings = analyze_video_feed(video_path, platform)
     except Exception as e:
@@ -55,7 +56,13 @@ def scan_endpoint():
 
     # 5. Run Video Logic & BUILD LINKS
     print("✂️ Processing Items...")
-    for item in listings:
+    
+    # DEBUG: Print the whole list to see timestamps
+    print(f"🔍 RAW AI DATA: {listings}")
+
+    for i, item in enumerate(listings):
+        print(f"   Processing Item {i+1}: {item.get('title')}")
+        
         # A. Crop Image
         image_name = crop_frame(
             video_path, 
@@ -63,25 +70,23 @@ def scan_endpoint():
             app.config['PRODUCT_FOLDER'], 
             item.get('title', 'Unknown_Item')
         )
+        
+        # CRITICAL FIX: Force unique assignment
         item['image'] = image_name
+        print(f"      -> Generated Image: {image_name}")
 
-        # B. BUILD LIVE MARKET LINKS (The Fix)
-        # We URL-encode the title so spaces become %20, etc.
+        # B. BUILD LIVE MARKET LINKS
         safe_query = urllib.parse.quote(item['title'])
         
-        # Link 1: eBay SOLD Listings (Shows actual market value)
         ebay_link = f"https://www.ebay.com/sch/i.html?_nkw={safe_query}&LH_Sold=1&LH_Complete=1"
-        
-        # Link 2: Google Shopping
         google_link = f"https://www.google.com/search?q={safe_query}&tbm=shop"
         
-        # Add these to the item dictionary
         item['sources'] = [ebay_link, google_link]
 
     # 6. Render Results
     print(f"🚀 Rendering report with {len(listings)} items...")
-    return render_template('report.html', listings=listings, platform=platform)
+    scan_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    return render_template('report.html', listings=listings, platform=platform, scan_date=scan_date)
 
 if __name__ == '__main__':
-    # Host 0.0.0.0 allows your phone to connect
     app.run(debug=True, host='0.0.0.0', port=5000)

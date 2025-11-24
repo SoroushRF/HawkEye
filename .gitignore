@@ -1,4 +1,13 @@
+# Security (NEVER commit this)
 .env
-venv/
+
+# Python junk
 __pycache__/
-*.mp4
+*.pyc
+
+# Heavy Media & Test Outputs
+static/uploads/*
+static/products/*
+
+# OS junk
+.DS_Store

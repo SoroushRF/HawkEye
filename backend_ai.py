@@ -80,7 +80,7 @@ def analyze_video_feed(video_path, platform_strategy):
     # D. Call the Model
     # FIX: We REMOVED 'response_mime_type' so Search can work
     response = client.models.generate_content(
-        model='gemini-2.5-flash-lite',
+        model='gemini-2.5-flash',
         contents=[uploaded_file, prompt],
         config=types.GenerateContentConfig(
             tools=[types.Tool(google_search=types.GoogleSearch())], # Keep Search

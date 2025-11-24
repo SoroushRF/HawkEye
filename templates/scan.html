@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Price Finder | Home</title>
+    <title>HAWKEYE | Home</title>
     
     <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}" type="image/png">
 
@@ -18,7 +18,7 @@
     <div class="max-w-md mx-auto lg:max-w-4xl lg:pt-12">
 
         <header class="mb-8 text-center lg:text-left">
-            <h1 class="text-3xl font-bold tracking-tight text-blue-600">Price Finder</h1>
+            <h1 class="text-3xl font-bold tracking-tight text-blue-600">HAWKEYE</h1>
             <p class="text-sm text-gray-500 mt-1">Find the best price for your items instantly.</p>
         </header>
 
@@ -43,38 +43,7 @@
                         </div>
                     </div>
                     
-                    <h3 class="text-md font-bold text-gray-700 border-b border-gray-100 pb-1 pt-2 flex items-center">
-                        <i class="ph ph-sparkle text-blue-500 mr-2"></i> Extra Options
-                    </h3>
-
-                    <div>
-                        <label class="block text-sm font-medium mb-3 text-gray-600">Search Speed:</label>
-                        <div class="flex space-x-4">
-                            <label class="flex items-center space-x-2 text-sm text-gray-700 cursor-pointer">
-                                <input type="radio" name="priority" value="quick" class="form-radio text-blue-600 focus:ring-blue-500" checked>
-                                <span>Fast Search</span>
-                            </label>
-                            <label class="flex items-center space-x-2 text-sm text-gray-700 cursor-pointer">
-                                <input type="radio" name="priority" value="deep" class="form-radio text-blue-600 focus:ring-blue-500">
-                                <span>Deep Search (Slower)</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
-                        <label for="target_isolation" class="text-sm font-medium text-gray-600 flex items-center cursor-pointer">
-                            <i class="ph ph-crop text-gray-400 mr-2"></i> Auto-Crop Image
-                        </label>
-                        <input type="checkbox" id="target_isolation" name="target_isolation" value="true" class="form-checkbox h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
-                    </div>
-
-                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
-                        <label for="proximity_search" class="text-sm font-medium text-gray-600 flex items-center cursor-pointer">
-                            <i class="ph ph-map-pin text-gray-400 mr-2"></i> Check Local Prices
-                        </label>
-                        <input type="checkbox" id="proximity_search" name="proximity_search" value="true" class="form-checkbox h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
-                    </div>
-
+                    
                 </div>
 
                 <div class="lg:w-1/2">
@@ -82,9 +51,6 @@
                     <div class="flex border-b border-gray-200 mb-6 lg:mt-0">
                         <button type="button" id="tab-file" class="friendly-tab active" onclick="showInput('file')">
                             <i class="ph ph-camera mr-2"></i> Use Camera
-                        </button>
-                        <button type="button" id="tab-video" class="friendly-tab" onclick="showInput('video')">
-                            <i class="ph ph-link mr-2"></i> Use Link
                         </button>
                     </div>
 
@@ -118,7 +84,7 @@
                     </div>
                 </div>
             </div>
-            
+            <br>
             <button type="submit" class="w-full py-4 text-lg font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-200 transition-all duration-200 transform hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-blue-200">
                 Find Best Price
             </button>
