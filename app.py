@@ -1,8 +1,10 @@
 import os
+import shutil
 import urllib.parse
+import mimetypes
 from flask import Flask, render_template, request
 from backend_video import crop_frame
-from backend_ai import analyze_video_feed
+from backend_ai import analyze_media_feed
 import datetime
 
 app = Flask(__name__)
@@ -15,7 +17,7 @@ app.config['PRODUCT_FOLDER'] = 'static/products'
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 os.makedirs(app.config['PRODUCT_FOLDER'], exist_ok=True)
 
-# DEMO MODE: Set to True if Wi-Fi fails during the pitch
+# DEMO MODE
 DEMO_MODE = False 
 
 @app.route('/')
@@ -26,19 +28,24 @@ def home():
 def scan_endpoint():
     # 1. Validation
     if 'media_file' not in request.files:
-        return "No video uploaded", 400
+        return "No media uploaded", 400
 
-    video = request.files['media_file']
+    media = request.files['media_file']
+    filename = media.filename
     
     # Capture inputs
     platform = request.form.get('platform', 'eBay')
     
-    # 2. Save Video Locally
-    video_path = os.path.join(app.config['UPLOAD_FOLDER'], video.filename)
-    video.save(video_path)
-    print(f"✅ Video saved to: {video_path}")
+    # 2. Save Media Locally
+    media_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    media.save(media_path)
+    print(f"✅ Media saved to: {media_path}")
 
-    # 3. PANIC BUTTON (Demo Mode)
+    # Determine type (Video vs Image)
+    mime_type, _ = mimetypes.guess_type(media_path)
+    is_video = mime_type and mime_type.startswith('video')
+
+    # 3. PANIC BUTTON
     if DEMO_MODE:
         import json
         import time
@@ -47,61 +54,62 @@ def scan_endpoint():
             scan_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             return render_template('report.html', listings=json.load(f), platform=platform, scan_date=scan_date)
 
-    # 4. Run AI Logic
+    # 4. Run AI Logic (Works for both Image and Video)
     try:
-        listings = analyze_video_feed(video_path, platform)
+        listings = analyze_media_feed(media_path, platform)
     except Exception as e:
         print(f"❌ AI Error: {e}")
         return f"AI Processing Failed: {str(e)}", 500
 
-    # 5. Run Video Logic & BUILD LINKS
+    # 5. Process Listings (Crop/Copy & Link Building)
     print("✂️ Processing Items...")
     
-    # Used to prevent duplicate timestamps
-    seen_timestamps = set()
+    # Track used timestamps to prevent duplicate frames in videos
+    used_timestamps = []
 
     for i, item in enumerate(listings):
         title = item.get('title', 'Unknown_Item')
-        timestamp = float(item.get('timestamp', 0))
-        
-        print(f"   Processing Item {i+1}: {title} at {timestamp}s")
-        
-        # --- TIMESTAMP DE-DUPLICATION ---
-        # If this timestamp was already used (e.g. two items at 0:05), 
-        # bump this one by 1.5 seconds to try and find a distinct frame.
-        if int(timestamp) in seen_timestamps:
-            print(f"      ⚠️ Duplicate timestamp detected. Shifting {timestamp} -> {timestamp + 1.5}")
-            timestamp += 1.5
-        
-        seen_timestamps.add(int(timestamp))
         
         # --- UNIQUE FILENAME GENERATION ---
-        # We append the index 'i' to the name. 
-        # This prevents "Shirt" overwriting the previous "Shirt".
+        # {Index}_{CleanTitle} guarantees Item 1's pic != Item 2's pic
         clean_title = "".join(x for x in title if x.isalnum())[:10]
-        unique_name_for_file = f"{i}_{clean_title}"
+        unique_filename = f"{i}_{clean_title}.jpg"
+        output_path = os.path.join(app.config['PRODUCT_FOLDER'], unique_filename)
 
-        # A. Crop Image
-        image_name = crop_frame(
-            video_path, 
-            timestamp, 
-            app.config['PRODUCT_FOLDER'], 
-            unique_name_for_file 
-        )
-        
-        # Assign the unique image to this specific item
-        item['image'] = image_name
-        # Update timestamp in display to match the shifted one
-        item['timestamp'] = round(timestamp, 1)
-
-        print(f"      -> Generated Image: {image_name}")
+        if is_video:
+            # === VIDEO LOGIC ===
+            raw_time = float(item.get('timestamp', 0))
+            
+            # Timestamp Shifting (Collision Avoidance)
+            adjusted_time = raw_time
+            for used_time in used_timestamps:
+                if abs(adjusted_time - used_time) < 1.5:
+                    print(f"   ⚠️ Timestamp collision at {adjusted_time}s. Shifting +2s...")
+                    adjusted_time += 2.0
+            
+            used_timestamps.append(adjusted_time)
+            
+            # Extract Frame
+            crop_frame(media_path, adjusted_time, app.config['PRODUCT_FOLDER'], f"{i}_{clean_title}")
+            
+            # Update Item Data
+            item['image'] = unique_filename
+            item['timestamp'] = f"{round(adjusted_time, 1)}s"
+            
+        else:
+            # === IMAGE LOGIC ===
+            # No cropping needed. We copy the source image for this item.
+            # If the user uploaded one photo with 3 items, all 3 items get the full photo.
+            shutil.copy(media_path, output_path)
+            
+            # Update Item Data
+            item['image'] = unique_filename
+            item['timestamp'] = "(Still Image)"
 
         # B. BUILD LIVE MARKET LINKS
         safe_query = urllib.parse.quote(title)
-        
         ebay_link = f"https://www.ebay.com/sch/i.html?_nkw={safe_query}&LH_Sold=1&LH_Complete=1"
         google_link = f"https://www.google.com/search?q={safe_query}&tbm=shop"
-        
         item['sources'] = [ebay_link, google_link]
 
     # 6. Render Results

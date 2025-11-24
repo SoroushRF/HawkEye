@@ -14,6 +14,7 @@ function showInput(type) {
         fileTab.classList.add('active');
         videoTab.classList.remove('active');
         
+        // Reset and require
         fileInput.required = true;
         videoInput.required = false;
         videoInput.value = ''; 
@@ -23,6 +24,7 @@ function showInput(type) {
         fileTab.classList.remove('active');
         videoTab.classList.add('active');
 
+        // Reset and require
         fileInput.required = false;
         fileInput.value = ''; 
         videoInput.required = true;
@@ -30,38 +32,27 @@ function showInput(type) {
 }
 
 /**
- * Updates the visual status (Checkmark vs Upload Icon).
- * BULLETPROOF VERSION: If a file exists, it turns GREEN. No complex checks.
+ * VISUAL FEEDBACK: Green Box Logic
+ * If a file exists in the array, we turn green. Simple as that.
  */
-function updateScanStatus(file) {
+function updateScanStatus(hasFile) {
     const checkIcon = document.getElementById('scanStatusCheck');
     const scannerText = document.getElementById('scannerText');
     const scannerIcon = document.getElementById('scannerIcon');
 
-    // SIMPLEST LOGIC POSSIBLE: Do we have a file?
-    if (file) {
-        // 1. Show Green Checkmark
+    if (hasFile) {
+        // --- GREEN SUCCESS STATE ---
         checkIcon.classList.remove('hidden');
         
-        // 2. Turn Text Green
+        scannerText.textContent = 'Media Ready!';
         scannerText.classList.add('text-green-600');
         scannerText.classList.remove('text-gray-700');
         
-        // 3. Update Icon & Text
-        // We do a basic name check just for the icon, but the STATE is always green now.
-        const fileName = file.name || '';
-        const isVideo = file.type.startsWith('video/') || /\.(mp4|mov|avi|mkv|wmv|qt)$/i.test(fileName);
-
-        if (isVideo) {
-            scannerText.textContent = 'Video Ready!';
-            scannerIcon.className = 'ph ph-video-camera text-4xl text-green-500'; 
-        } else {
-            scannerText.textContent = 'Image Ready!';
-            scannerIcon.className = 'ph ph-image text-4xl text-green-500'; 
-        }
+        // Universal Success Icon
+        scannerIcon.className = 'ph ph-check-circle text-4xl text-green-500'; 
         
     } else {
-        // RESET TO DEFAULT
+        // --- DEFAULT BLUE STATE ---
         checkIcon.classList.add('hidden');
         scannerText.textContent = 'Upload Photo or Video';
         scannerText.classList.remove('text-green-600');
@@ -71,12 +62,11 @@ function updateScanStatus(file) {
     }
 }
 
-
 function attachTapEffect() {
     const fileInput = document.getElementById('file-upload');
     const filePanel = document.getElementById('fileInputPanel');
     
-    // Visual flash when clicking
+    // 1. Click Animation
     fileInput.addEventListener('click', function() {
         filePanel.classList.add('border-blue-500', 'bg-blue-50');
         setTimeout(() => {
@@ -84,47 +74,59 @@ function attachTapEffect() {
         }, 300); 
     });
 
-    // Handle file selection
+    // 2. Change Listener (The Green Box Trigger)
     fileInput.addEventListener('change', function() {
-        if (this.files && this.files.length > 0) {
-            // Instant update
-            updateScanStatus(this.files[0]); 
-        } else {
-            updateScanStatus(null); 
-        }
+        // iOS sometimes takes a ms to update the files array, so we check existence
+        const hasFiles = this.files && this.files.length > 0;
+        updateScanStatus(hasFiles);
     });
 }
 
-// FORCE LOADING SCREEN ON IPHONE
 function attachFormSubmit() {
     const form = document.getElementById('scanForm');
     if (!form) return;
 
     form.addEventListener('submit', function(e) {
-        // 1. PAUSE submission
+        // 1. STOP the form immediately
         e.preventDefault();
         
         const hudOverlay = document.getElementById('hudOverlay');
         
-        // 2. Force the overlay to appear
+        // 2. Force the Overlay to Appear
         hudOverlay.classList.remove('hidden');
-        // This line forces the browser to paint the new pixels immediately
+        
+        // 3. MAGIC TRICK: Force browser to paint pixels
+        // Accessing offsetWidth forces a reflow, ensuring the UI updates visually
         void hudOverlay.offsetWidth; 
 
-        // 3. Fade it in
+        // 4. Fade In
         hudOverlay.classList.remove('opacity-0');
         hudOverlay.classList.add('opacity-100');
 
-        // 4. WAIT 100ms, THEN submit. 
-        // This gives the iPhone GPU time to render the overlay before the network freezes it.
+        // 5. WAIT for the paint to finish (200ms), THEN Submit
+        // This ensures the "Analyzing" screen is visible before the network locks the UI.
         setTimeout(() => {
             form.submit();
-        }, 150); 
+        }, 200); 
     });
 }
 
+// Fix for Safari "Back Button" leaving the overlay on screen
+window.addEventListener("pageshow", function(event) {
+    const hudOverlay = document.getElementById('hudOverlay');
+    if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+        if(hudOverlay) {
+            hudOverlay.classList.add('hidden');
+            hudOverlay.classList.add('opacity-0');
+        }
+    }
+});
+
+// INITIALIZE
 document.addEventListener('DOMContentLoaded', () => {
+    // Default to file view
     showInput('file');
+    // Attach event listeners
     attachTapEffect();
     attachFormSubmit(); 
 });

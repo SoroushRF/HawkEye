@@ -17,10 +17,6 @@ if not API_KEY:
 client = genai.Client(api_key=API_KEY)
 
 def clean_json(text):
-    """
-    Helper to strip markdown formatting (```json ... ```) 
-    that Gemini sometimes adds when Search is enabled.
-    """
     text = text.strip()
     if text.startswith("```json"):
         text = text[7:] 
@@ -30,28 +26,28 @@ def clean_json(text):
         text = text[:-3]
     return text.strip()
 
-def analyze_video_feed(video_path, platform_strategy):
+def analyze_media_feed(media_path, platform_strategy):
     """
-    Sends the video to Gemini 2.5 and returns a list of items found.
+    Sends Video OR Image to Gemini 2.5 and returns a list of items found.
     """
     
-    # A. Upload Video
-    print(f"📡 Uploading to Gemini... ({os.path.basename(video_path)})")
-    if not os.path.exists(video_path):
-        raise FileNotFoundError(f"Video file not found: {video_path}")
+    # A. Upload Media (Gemini handles both video and image via Files API)
+    print(f"📡 Uploading to Gemini... ({os.path.basename(media_path)})")
+    if not os.path.exists(media_path):
+        raise FileNotFoundError(f"Media file not found: {media_path}")
 
-    uploaded_file = client.files.upload(file=video_path)
+    uploaded_file = client.files.upload(file=media_path)
     
-    # B. Wait for Google to Process it
+    # B. Wait for Processing (Mainly for videos, images are fast)
     while uploaded_file.state.name == "PROCESSING":
-        print("... AI is watching the video ...")
-        time.sleep(2)
+        print("... AI is processing media ...")
+        time.sleep(1)
         uploaded_file = client.files.get(name=uploaded_file.name)
 
     if uploaded_file.state.name == "FAILED":
-        raise ValueError("Gemini failed to process the video.")
+        raise ValueError("Gemini failed to process the media file.")
 
-    # C. The "HawkEye" Prompt (HARDENED FOR HACKATHON)
+    # C. The "HawkEye" Prompt
     print("🧠 HawkEye Thinking...")
     
     prompt = f"""
@@ -59,10 +55,10 @@ def analyze_video_feed(video_path, platform_strategy):
     Strategy: {platform_strategy}.
     
     INSTRUCTIONS:
-    1. Watch the video. Identify EVERY distinct item you see.
-    2. **TIMESTAMPS**: Provide the exact timestamp (in seconds) where the item is MOST VISIBLE. 
-    3. **IMPORTANT**: Ensure timestamps are distinct. Do not put all items at 0.0s. Spread them out as they appear.
-    4. Listen to the AUDIO. Did the user mention damage or brand names?
+    1. Analyze the media (Video or Image). Identify EVERY distinct item you see.
+    2. **TIMESTAMPS (Video Only)**: If this is a video, provide the timestamp (seconds) where the item is MOST VISIBLE. If this is a still image, use 0.
+    3. **DISTINCTNESS**: Do NOT output multiple items with the exact same timestamp/ID unless they are clearly different objects.
+    4. **AUDIO (Video Only)**: Listen to audio if available. Did the user mention damage or brand names?
     5. Return pure JSON.
     
     OUTPUT SCHEMA (List of Objects):
@@ -97,9 +93,10 @@ def analyze_video_feed(video_path, platform_strategy):
 
 # --- TEST BLOCK ---
 if __name__ == "__main__":
-    test_video = "static/uploads/test.mp4"
+    # You can change this to test.jpg to test images
+    test_media = "static/uploads/test.mp4" 
     try:
-        results = analyze_video_feed(test_video, "eBay")
+        results = analyze_media_feed(test_media, "eBay")
         print("\n✅ AI RESULTS:")
         print(json.dumps(results, indent=2))
     except Exception as e:
